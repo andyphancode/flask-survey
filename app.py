@@ -1,11 +1,16 @@
 from flask import Flask, request, render_template, redirect, flash, session
 from surveys import satisfaction_survey
-from flask_debugtoolbar import DebugToolbarExtension
+
+# Reenable during development
+# from flask_debugtoolbar import DebugToolbarExtension
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = "secretkey"
+app.config['SECRET_KEY'] = "secretkey1234567890097654421qhjg"
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
-debug = DebugToolbarExtension(app)
+
+# Reenable during development
+# debug = DebugToolbarExtension(app)
+
 
 RESPONSEKEY = "responses"
 
@@ -13,8 +18,6 @@ RESPONSEKEY = "responses"
 @app.route("/")
 def root_route():
     """Return home page template"""
-
-    
 
     return render_template("home.html", satisfaction_survey=satisfaction_survey)
 
@@ -30,6 +33,8 @@ def show_question(question_id):
     
     response = session[RESPONSEKEY]
 
+    # Handle cases regarding invalid response states
+    
     if (len(response) != question_id):
         flash("Invalid question")
         return redirect(f"/question/{len(response)}")
