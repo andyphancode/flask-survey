@@ -1,5 +1,5 @@
-from flask import Flask, request, render_template, redirect, flash
-from surveys import Survey, Question, satisfaction_survey, personality_quiz, surveys
+from flask import Flask, request, render_template, redirect, flash, session
+from surveys import satisfaction_survey
 from flask_debugtoolbar import DebugToolbarExtension
 
 app = Flask(__name__)
@@ -7,7 +7,7 @@ app.config['SECRET_KEY'] = "secretkey"
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 debug = DebugToolbarExtension(app)
 
-RESPONSEKEY = []
+RESPONSEKEY = "responses"
 
 
 @app.route("/")
@@ -21,14 +21,14 @@ def root_route():
 @app.route("/start", methods=["POST"])
 def start():
     """Clears responses"""
-    RESPONSEKEY = []
+    session[RESPONSEKEY] = []
     return redirect("/question/0")
 
 @app.route("/question/<int:question_id>")
 def show_question(question_id):
     """Shows question that user is on"""
     
-    response = RESPONSEKEY
+    response = session[RESPONSEKEY]
 
     if (len(response) != question_id):
         flash("Invalid question")
@@ -51,9 +51,9 @@ def answer():
 
     answer = request.form['answer']
 
-    
-    RESPONSEKEY.append(answer)
-    response = RESPONSEKEY
+    response = session[RESPONSEKEY]
+    response.append(answer)
+    session[RESPONSEKEY] = response
 
     if (len(response) == len(satisfaction_survey.questions)):
         return redirect("/finish")
